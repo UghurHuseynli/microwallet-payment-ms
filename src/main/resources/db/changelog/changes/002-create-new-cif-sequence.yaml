@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1776239977351-1-create-cif-sequence
+      author: Ughur
+      changes:
+        - createSequence:
+            sequenceName: cif_sequence
+            startValue: 1000000000
+            incrementBy: 1

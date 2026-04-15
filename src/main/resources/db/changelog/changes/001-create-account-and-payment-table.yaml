@@ -1,0 +1,79 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1776239501891-1
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_accounts
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: balance
+                  type: DECIMAL
+              - column:
+                  constraints:
+                    nullable: false
+                  name: cif
+                  type: BIGINT
+              - column:
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+            tableName: accounts
+  - changeSet:
+      id: 1776239501891-2
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_payments
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: currency
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: amount
+                  type: DECIMAL
+              - column:
+                  constraints:
+                    nullable: false
+                  name: account_id
+                  type: BIGINT
+            tableName: payments
+  - changeSet:
+      id: 1776239501891-3
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: cif
+            constraintName: uc_accounts_cif
+            tableName: accounts
+
