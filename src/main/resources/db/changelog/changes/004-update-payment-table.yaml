@@ -1,0 +1,72 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1776340332557-1
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: fee_amount
+                  type: DECIMAL
+              - column:
+                  name: fee_percentage
+                  type: DECIMAL
+              - column:
+                  name: payment_status
+                  type: VARCHAR(255)
+              - column:
+                  name: payment_type
+                  type: VARCHAR(255)
+              - column:
+                  name: total_amount
+                  type: DECIMAL
+            tableName: payments
+  - changeSet:
+      id: 1776340332557-2
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: fee_amount
+            tableName: payments
+  - changeSet:
+      id: 1776340332557-4
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: fee_percentage
+            tableName: payments
+  - changeSet:
+      id: 1776340332557-6
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: payment_status
+            tableName: payments
+  - changeSet:
+      id: 1776340332557-8
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: payment_type
+            tableName: payments
+  - changeSet:
+      id: 1776340332557-10
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: total_amount
+            tableName: payments
+  - changeSet:
+      id: 1776340332557-11
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropSequence:
+            sequenceName: cif_sequence
+

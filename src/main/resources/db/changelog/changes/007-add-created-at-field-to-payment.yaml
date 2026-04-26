@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1776410597447-1-add-created-at-field
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: created_at
+                  type: DATETIME
+            tableName: payments
+  - changeSet:
+      id: 1776410597447-2
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnName: created_at
+            tableName: payments

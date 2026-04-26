@@ -1,4 +1,4 @@
-package az.abb.payment.dto;
+package az.abb.payment.dto.request;
 
 import az.abb.payment.enums.Currency;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,8 @@
 package az.abb.payment.entity;
 
+import az.abb.payment.enums.Currency;
 import jakarta.persistence.*;
+import liquibase.datatype.core.CurrencyType;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -26,6 +28,10 @@ public class Account {
 
     @Column(nullable = false)
     private BigDecimal balance;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     @Column(unique = true, nullable = false, updatable = false, length = 15)
     private Long cif;

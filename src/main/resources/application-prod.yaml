@@ -1,0 +1,12 @@
+server:
+  port: 80
+
+spring:
+  datasource:
+    url: ${PSQLDB_URL}
+
+  jpa:
+    show-sql: false
+
+  kafka:
+    bootstrap-servers: kafka-cluster-01:9092

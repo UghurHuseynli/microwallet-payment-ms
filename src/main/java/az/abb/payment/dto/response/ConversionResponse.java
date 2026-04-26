@@ -1,4 +1,4 @@
-package az.abb.payment.dto;
+package az.abb.payment.dto.response;
 
 import az.abb.payment.enums.Currency;
 import lombok.AllArgsConstructor;
@@ -20,5 +20,5 @@ public class ConversionResponse {
     private Currency toCurrency;
     private BigDecimal feeAmount;
     private BigDecimal feePercentage;
-    private String status;
+    private BigDecimal netAmount;
 }

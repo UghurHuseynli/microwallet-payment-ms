@@ -1,10 +1,14 @@
 package az.abb.payment.entity;
 
 import az.abb.payment.enums.Currency;
+import az.abb.payment.enums.PaymentStatus;
+import az.abb.payment.enums.PaymentType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -29,4 +33,16 @@ public class Payment {
 
     @Column(nullable = false)
     private Long accountId;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }

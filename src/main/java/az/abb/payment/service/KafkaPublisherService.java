@@ -1,6 +1,5 @@
 package az.abb.payment.service;
 
-import az.abb.payment.dto.PaymentResultEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +19,8 @@ public class KafkaPublisherService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    public Object publishPaymentResult(PaymentResultEvent event, String topic) {
+    public <T> String publish(T event, String topic) {
         String eventId = UUID.randomUUID().toString();
-        event.setEventId(eventId);
 
         try {
             String payload = objectMapper.writeValueAsString(event);
@@ -31,9 +29,9 @@ public class KafkaPublisherService {
 
             future.whenComplete((result, ex) -> {
                 if (ex != null) {
-                    log.error("Failed to publish payment result event [{}]: {}", eventId, ex.getMessage());
+                    log.error("Failed to publish event [{}]: {}", eventId, ex.getMessage());
                 } else {
-                    log.info("Successfully result   event [{}] published to topic [{}] partition [{}] offset [{}]",
+                    log.info("Successfully result event [{}] published to topic [{}] partition [{}] offset [{}]",
                             eventId,
                             result.getRecordMetadata().topic(),
                             result.getRecordMetadata().partition(),
@@ -41,7 +39,7 @@ public class KafkaPublisherService {
                 }
             });
         } catch (JsonProcessingException e) {
-            log.error("Failed to publish PaymentResultEvent: {}", e.getMessage());
+            log.error("Failed to publish event: {}", e.getMessage());
             throw new RuntimeException("Event serialization failed", e);
         }
         return eventId;

@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1776340991272-1
+      author: Ughur
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropColumn:
+            columnName: fee_amount
+            tableName: payments
+        - dropColumn:
+            columnName: fee_percentage
+            tableName: payments
+        - dropColumn:
+            columnName: total_amount
+            tableName: payments
+

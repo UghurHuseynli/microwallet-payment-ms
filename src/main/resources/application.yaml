@@ -1,9 +1,12 @@
 server:
   port: 8081
-
 spring:
   application:
     name: payment-ms
+  profiles:
+    active: dev
+  config:
+    import: optional:file:.env[.properties]
 
   servlet:
     multipart:
@@ -11,19 +14,9 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
-  config:
-    import: optional:file:.env[.properties]
-
-  datasource:
-    url: ${PSQLDB_URL}
-    username: ${PSQLDB_NAME}
-    password: ${PSQLDB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -32,7 +25,6 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
 
   kafka:
-    bootstrap-servers: localhost:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -44,23 +36,12 @@ kafka:
     payment-result: payment-result-topic
     convert-result: convert-result-topic
     document-result: document-result-topic
-  groups:
-
 
 springdoc:
   swagger-ui:
     path: /docs
   api-docs:
-    path: /vs/api-docs
-
-application:
-  security:
-    jwt:
-      secret-key: ${JWT_SECRET_KEY}
-
-logging:
-  level:
-    liquibase: info
+    path: /v3/api-docs
 
 currency:
   rates:
@@ -76,3 +57,7 @@ currency:
 payment:
   fee:
     percentage: 1.5
+
+logging:
+  level:
+    liquibase: info
