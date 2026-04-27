@@ -5,9 +5,10 @@ import az.abb.payment.enums.PaymentType;
 
 import java.math.BigDecimal;
 
-public record PaymentRequest (
-    BigDecimal amount,
-    Currency currencyType,
-    PaymentType paymentType,
-    String description
-    ) {}
+public record PaymentRequest(
+        BigDecimal amount,
+        Currency currencyType,
+        PaymentType paymentType,
+        String description
+) {
+}

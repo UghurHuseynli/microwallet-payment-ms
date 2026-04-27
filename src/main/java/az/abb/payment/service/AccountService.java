@@ -6,7 +6,6 @@ import az.abb.payment.entity.Account;
 import az.abb.payment.enums.AccountStatus;
 import az.abb.payment.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,29 +1,32 @@
+version: '3.8'
+
+networks:
+  ms-network:
+    name: ms-network
+    driver: bridge
+
+volumes:
+  kafka-kraft-data:
+
 services:
 
   kafka:
     image: confluentinc/cp-kafka:7.6.1
     container_name: kafka-kraft
     restart: unless-stopped
+    networks: [ms-network]
     ports:
-      - "9092:9092"   # host access
-      - "29092:29092" # inter-broker / internal Docker
+      - "9092:9092"
+      - "29092:29092"
     environment:
-      # ── KRaft identity ──────────────────────────────────────────
       KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller          # single node acts as both
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093    # nodeId@host:controllerPort
-
-      # ── Listeners ───────────────────────────────────────────────
-      # PLAINTEXT_HOST → localhost:9092  (Spring Boot on host machine)
-      # PLAINTEXT      → kafka:29092     (other Docker containers)
-      # CONTROLLER     → kafka:9093      (KRaft internal, never exposed)
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_LISTENERS: PLAINTEXT_HOST://0.0.0.0:9092,PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_HOST://localhost:9092,PLAINTEXT://kafka:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT_HOST:PLAINTEXT,PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-
-      # ── Topic defaults ───────────────────────────────────────────
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_NUM_PARTITIONS: 3
       KAFKA_DEFAULT_REPLICATION_FACTOR: 1
@@ -31,18 +34,12 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-
-      # ── Log retention ────────────────────────────────────────────
-      KAFKA_LOG_RETENTION_HOURS: 168          # 7 days
-      KAFKA_LOG_RETENTION_BYTES: 1073741824   # 1 GB per partition
-      KAFKA_LOG_SEGMENT_BYTES: 104857600      # 100 MB per segment
-
-      # ── Performance / tuning ─────────────────────────────────────
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_RETENTION_BYTES: 1073741824
+      KAFKA_LOG_SEGMENT_BYTES: 104857600
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_LOG_FLUSH_INTERVAL_MESSAGES: 10000
       KAFKA_LOG_FLUSH_INTERVAL_MS: 1000
-
-      # ── KRaft cluster ID (must be base64 UUID, fixed value) ──────
       CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qg"
     volumes:
       - kafka-kraft-data:/var/lib/kafka/data
@@ -57,6 +54,7 @@ services:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
     restart: unless-stopped
+    networks: [ms-network]
     depends_on:
       kafka:
         condition: service_healthy
@@ -67,5 +65,16 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       DYNAMIC_CONFIG_ENABLED: "true"
 
-volumes:
-  kafka-kraft-data:
+  payment-service:
+    build: .
+    container_name: payment-service
+    restart: unless-stopped
+    networks: [ms-network]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092

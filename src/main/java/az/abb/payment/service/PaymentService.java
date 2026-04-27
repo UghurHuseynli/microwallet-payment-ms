@@ -12,6 +12,8 @@ import az.abb.payment.exception.InsufficientFundsException;
 import az.abb.payment.mapper.PaymentMapper;
 import az.abb.payment.repository.AccountRepository;
 import az.abb.payment.repository.PaymentRepository;
+import az.abb.payment.strategy.Payable;
+import az.abb.payment.strategy.PaymentStrategyResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,7 @@ public class PaymentService {
     private final PaymentMapper paymentMapper;
     private final Environment env;
 
+    private final PaymentStrategyResolver strategyResolver;
 
     @Value("${kafka.topics.payment-result}")
     private String paymentResultTopic;
@@ -59,6 +62,8 @@ public class PaymentService {
                 .paymentType(request.paymentType())
                 .build();
         paymentRepository.save(payment);
+        Payable strategy = strategyResolver.resolve(request.paymentType());
+        strategy.doPayment(account, payment, finalAmount);
 
         PaymentHistoryEvent event = paymentMapper.toResponse(payment);
 
