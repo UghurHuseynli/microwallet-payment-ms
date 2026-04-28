@@ -1,21 +1,14 @@
-# ── Stage 1: Build custom-linkedlist ──────────────────────────
-FROM eclipse-temurin:25-jdk AS lib-builder
-WORKDIR /lib
-
-COPY custom-linkedlist/ .
-RUN chmod +x gradlew && ./gradlew publishToMavenLocal --no-daemon
-
-# ── Stage 2: Build payment-service ────────────────────────────
+# ── Stage 1: Build payment-service ────────────────────────────
 FROM eclipse-temurin:25-jdk AS builder
 WORKDIR /app
 
-# copy the local maven repo from previous stage
-COPY --from=lib-builder /root/.m2 /root/.m2
+# Copy local Maven repository with custom-linkedlist
+COPY .m2 /root/.m2
 
 COPY . .
 RUN chmod +x gradlew && ./gradlew bootJar --no-daemon -x test
 
-# ── Stage 3: Run ──────────────────────────────────────────────
+# ── Stage 2: Run ──────────────────────────────────────────────
 FROM eclipse-temurin:25-jre
 WORKDIR /app
 

@@ -39,3 +39,4 @@ out/
 target/
 *.md
 .mvn/
+.m2/

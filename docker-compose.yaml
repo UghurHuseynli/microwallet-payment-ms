@@ -7,6 +7,7 @@ networks:
 
 volumes:
   kafka-kraft-data:
+  postgres-data:
 
 services:
 
@@ -65,6 +66,26 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       DYNAMIC_CONFIG_ENABLED: "true"
 
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-payment
+    restart: unless-stopped
+    networks: [ms-network]
+    environment:
+      - POSTGRES_USER=${DOCKER_PSQLDB_NAME}
+      - POSTGRES_PASSWORD=${DOCKER_PSQLDB_PASSWORD}
+      - POSTGRES_DB=payment-ms
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d payment-ms"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   payment-service:
     build: .
     container_name: payment-service
@@ -73,8 +94,14 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     env_file:
       - .env
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: dev
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payment_db
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver

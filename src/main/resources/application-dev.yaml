@@ -1,8 +1,11 @@
 spring:
   datasource:
-    url: ${PSQLDB_URL:jdbc:postgresql://localhost:5432/payment_db}
-    username: ${PSQLDB_NAME:postgres}
-    password: ${PSQLDB_PASSWORD:password}
+    url: ${DOCKER_PSQLDB_URL:jdbc:postgresql://localhost:5432/payment_db}
+    username: ${DOCKER_PSQLDB_NAME:postgres}
+    password: ${DOCKER_PSQLDB_PASSWORD:password}
+#    url: ${LOCAL_PSQLDB_URL:jdbc:postgresql://localhost:5432/payment_db}
+#    username: ${LOCAL_PSQLDB_NAME:postgres}
+#    password: ${LOCAL_PSQLDB_PASSWORD:password}
 
   jpa:
     show-sql: true
