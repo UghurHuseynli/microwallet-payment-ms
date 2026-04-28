@@ -77,7 +77,7 @@ class PaymentServiceTest {
         BigDecimal requestAmount  = BigDecimal.valueOf(100);
         BigDecimal finalAmount    = BigDecimal.valueOf(92);
         BigDecimal initialBalance = BigDecimal.valueOf(500);
-        BigDecimal expectedBalance = initialBalance.subtract(finalAmount); // 408
+        BigDecimal expectedBalance = initialBalance.subtract(finalAmount);
 
         PaymentRequest request = new PaymentRequest(requestAmount, Currency.USD, PaymentType.TRANSFER, "Test payment");
 

@@ -37,11 +37,8 @@ class KafkaPublisherServiceTest {
 
     private static final String TOPIC = "test-topic";
 
-    // ─── publish ─────────────────────────────────────────────────────────────
-
     @Test
     void publish_ShouldReturnEventId_WhenPublishedSuccessfully() throws JsonProcessingException {
-        // Given
         TestEvent event = new TestEvent("data");
         String payload = "{\"data\":\"data\"}";
 
@@ -51,10 +48,8 @@ class KafkaPublisherServiceTest {
         given(objectMapper.writeValueAsString(event)).willReturn(payload);
         given(kafkaTemplate.send(eq(TOPIC), anyString(), eq(payload))).willReturn(future);
 
-        // When
         String eventId = kafkaPublisherService.publish(event, TOPIC);
 
-        // Then
         assertThat(eventId).isNotNull();
         assertThat(eventId).matches("[0-9a-f\\-]{36}"); // UUID format
 
@@ -64,7 +59,6 @@ class KafkaPublisherServiceTest {
 
     @Test
     void publish_ShouldReturnEventId_WhenKafkaSendFails() throws JsonProcessingException {
-        // Given — Kafka delivery failure should only log, not throw
         TestEvent event = new TestEvent("data");
         String payload = "{\"data\":\"data\"}";
 
@@ -75,10 +69,8 @@ class KafkaPublisherServiceTest {
         given(objectMapper.writeValueAsString(event)).willReturn(payload);
         given(kafkaTemplate.send(eq(TOPIC), anyString(), eq(payload))).willReturn(future);
 
-        // When
         String eventId = kafkaPublisherService.publish(event, TOPIC);
 
-        // Then — eventId is still returned, failure is only logged
         assertThat(eventId).isNotNull();
         assertThat(eventId).matches("[0-9a-f\\-]{36}");
     }
@@ -91,7 +83,6 @@ class KafkaPublisherServiceTest {
         given(objectMapper.writeValueAsString(event))
                 .willThrow(new JsonProcessingException("Serialization error") {});
 
-        // When / Then
         assertThatThrownBy(() -> kafkaPublisherService.publish(event, TOPIC))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Event serialization failed")
@@ -99,8 +90,6 @@ class KafkaPublisherServiceTest {
 
         verifyNoInteractions(kafkaTemplate);
     }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
 
     @SuppressWarnings("unchecked")
     private SendResult<String, Object> mockSendResult(String topic, int partition, long offset) {
@@ -111,8 +100,6 @@ class KafkaPublisherServiceTest {
         given(sendResult.getRecordMetadata()).willReturn(metadata);
         return sendResult;
     }
-
-    // ─── Test fixture ─────────────────────────────────────────────────────────
 
     record TestEvent(String data) {}
 }

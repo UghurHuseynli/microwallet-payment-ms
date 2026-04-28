@@ -28,13 +28,10 @@ class CurrencyServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        // Inject @Value field manually since Mockito doesn't handle @Value
         Field feeField = CurrencyService.class.getDeclaredField("feePercentage");
         feeField.setAccessible(true);
         feeField.set(currencyService, BigDecimal.valueOf(2));
     }
-
-    // ─── isSameCurrency ──────────────────────────────────────────────────────
 
     @Test
     void isSameCurrency_ShouldReturnTrue_WhenCurrenciesMatch() {
@@ -46,8 +43,6 @@ class CurrencyServiceTest {
         assertThat(currencyService.isSameCurrency(Currency.USD, Currency.EUR)).isFalse();
     }
 
-    // ─── convertToAccountCurrency ─────────────────────────────────────────────
-
     @Test
     void convertToAccountCurrency_ShouldReturnConvertResponse_WhenRateIsConfigured() {
         // Given
@@ -57,11 +52,6 @@ class CurrencyServiceTest {
         // When
         ConvertResponse response = currencyService.convertToAccountCurrency(amount, Currency.USD, Currency.EUR);
 
-        // Then
-        // rate        = 0.92
-        // convertedRaw = 100 * 0.92 = 92
-        // feeAmount    = 100 * 2 / 100 = 2.0000
-        // finalConverted = 92 - (2.0000 * 0.92) = 92 - 1.8400 = 90.1600
         assertThat(response.finalConverted()).isEqualByComparingTo(BigDecimal.valueOf(90.1600));
         assertThat(response.feeAmount()).isEqualByComparingTo(BigDecimal.valueOf(2));
         assertThat(response.feePercentage()).isEqualByComparingTo(BigDecimal.valueOf(2));
@@ -69,41 +59,31 @@ class CurrencyServiceTest {
 
     @Test
     void convertToAccountCurrency_ShouldThrowRuntimeException_WhenRateNotConfigured() {
-        // Given
         given(env.getProperty("currency.rates.USD_EUR")).willReturn(null);
 
-        // When / Then
         assertThatThrownBy(() ->
                 currencyService.convertToAccountCurrency(BigDecimal.valueOf(100), Currency.USD, Currency.EUR))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Exchange rate not configured for: currency.rates.USD_EUR");
     }
 
-    // ─── resolveAmount ────────────────────────────────────────────────────────
-
     @Test
     void resolveAmount_ShouldReturnOriginalAmount_WhenCurrenciesAreTheSame() {
-        // Given
         BigDecimal amount = BigDecimal.valueOf(100);
 
-        // When
         BigDecimal result = currencyService.resolveAmount(amount, Currency.USD, Currency.USD);
 
-        // Then
         assertThat(result).isEqualByComparingTo(amount);
-        verifyNoInteractions(env); // rate lookup should never happen
+        verifyNoInteractions(env);
     }
 
     @Test
     void resolveAmount_ShouldReturnConvertedAmount_WhenCurrenciesDiffer() {
-        // Given
         BigDecimal amount = BigDecimal.valueOf(100);
         given(env.getProperty("currency.rates.USD_EUR")).willReturn("0.92");
 
-        // When
         BigDecimal result = currencyService.resolveAmount(amount, Currency.USD, Currency.EUR);
 
-        // Then
         assertThat(result).isEqualByComparingTo(BigDecimal.valueOf(90.1600));
     }
 }

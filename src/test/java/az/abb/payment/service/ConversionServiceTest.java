@@ -49,7 +49,6 @@ class ConversionServiceTest {
 
     @Test
     void convertAmount_ShouldReturnConversionResponse_WhenEverythingIsValid() {
-        // Given
         Long userId = 1L;
 
         Account account = Account.builder()
@@ -58,9 +57,9 @@ class ConversionServiceTest {
                 .build();
 
         ConvertResponse convertResponse = new ConvertResponse(
-                BigDecimal.valueOf(92),   // finalConverted
-                BigDecimal.valueOf(2),    // feeAmount
-                BigDecimal.valueOf(2.0)   // feePercentage
+                BigDecimal.valueOf(92),
+                BigDecimal.valueOf(2),
+                BigDecimal.valueOf(2.0)
         );
 
         given(accountRepository.findByUserId(userId)).willReturn(Optional.of(account));
@@ -70,10 +69,8 @@ class ConversionServiceTest {
                 request.getToCurrency()
         )).willReturn(convertResponse);
 
-        // When
         ConversionResponse response = conversionService.convertAmount(userId, request);
 
-        // Then
         assertThat(response.getAccountId()).isEqualTo(10L);
         assertThat(response.getOriginalAmount()).isEqualByComparingTo(BigDecimal.valueOf(100));
         assertThat(response.getFromCurrency()).isEqualTo(Currency.USD);
@@ -81,7 +78,7 @@ class ConversionServiceTest {
         assertThat(response.getToCurrency()).isEqualTo(Currency.EUR);
         assertThat(response.getFeeAmount()).isEqualByComparingTo(BigDecimal.valueOf(2));
         assertThat(response.getFeePercentage()).isEqualByComparingTo(BigDecimal.valueOf(2.0));
-        assertThat(response.getNetAmount()).isEqualByComparingTo(BigDecimal.valueOf(90)); // 92 - 2
+        assertThat(response.getNetAmount()).isEqualByComparingTo(BigDecimal.valueOf(90));
 
         verify(accountRepository).findByUserId(userId);
         verify(currencyService).convertToAccountCurrency(
@@ -93,11 +90,9 @@ class ConversionServiceTest {
 
     @Test
     void convertAmount_ShouldThrowAccountNotFoundException_WhenAccountNotFound() {
-        // Given
         Long userId = 99L;
         given(accountRepository.findByUserId(userId)).willReturn(Optional.empty());
 
-        // When / Then
         assertThatThrownBy(() -> conversionService.convertAmount(userId, request))
                 .isInstanceOf(AccountNotFoundException.class)
                 .hasMessage("Account not found");
@@ -107,7 +102,6 @@ class ConversionServiceTest {
 
     @Test
     void convertAmount_ShouldPropagateException_WhenCurrencyServiceFails() {
-        // Given
         Long userId = 1L;
 
         Account account = Account.builder()
@@ -119,7 +113,6 @@ class ConversionServiceTest {
         given(currencyService.convertToAccountCurrency(any(), any(), any()))
                 .willThrow(new RuntimeException("Currency service unavailable"));
 
-        // When / Then
         assertThatThrownBy(() -> conversionService.convertAmount(userId, request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Currency service unavailable");

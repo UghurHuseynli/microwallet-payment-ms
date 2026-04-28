@@ -40,7 +40,6 @@ class AccountServiceTest {
 
     @Test
     void createAccount_ShouldReturnCreated_WhenAccountIsSavedSuccessfully() {
-        // Given
         Long userId = 1L;
         Long cifValue = 100L;
 
@@ -55,10 +54,8 @@ class AccountServiceTest {
         given(accountRepository.getNextCifValue()).willReturn(cifValue);
         given(accountRepository.save(any(Account.class))).willReturn(savedAccount);
 
-        // When
         AccountResponse response = accountService.createAccount(userId, accountRequest);
 
-        // Then
         assertThat(response.getStatus()).isEqualTo(AccountStatus.CREATED);
 
         verify(accountRepository).getNextCifValue();
@@ -72,30 +69,25 @@ class AccountServiceTest {
 
     @Test
     void createAccount_ShouldReturnFailed_WhenSavedAccountHasNoId() {
-        // Given
         Long userId = 1L;
         Long cifValue = 100L;
 
         Account savedAccount = Account.builder()
-                .id(null) // no ID → save failed
+                .id(null)
                 .build();
 
         given(accountRepository.getNextCifValue()).willReturn(cifValue);
         given(accountRepository.save(any(Account.class))).willReturn(savedAccount);
 
-        // When
         AccountResponse response = accountService.createAccount(userId, accountRequest);
 
-        // Then
         assertThat(response.getStatus()).isEqualTo(AccountStatus.FAILED);
     }
 
     @Test
     void createAccount_ShouldPropagateException_WhenRepositoryThrows() {
-        // Given
         given(accountRepository.getNextCifValue()).willThrow(new RuntimeException("DB error"));
 
-        // When / Then
         assertThatThrownBy(() -> accountService.createAccount(1L, accountRequest))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("DB error");
